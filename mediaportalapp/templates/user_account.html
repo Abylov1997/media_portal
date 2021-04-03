@@ -1,0 +1,58 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<div class="container">
+<h3 class="text-center">Личный кабинет пользователя {{ current_user.user }}</h3>
+<hr>
+	<div class="row">
+		<div class="col-sm-6">
+			<h4><strong>Личная информация:</strong></h4>
+			<p>Логин: {{ current_user.user }}</p>
+			<p>Имя: {{ current_user.first_name }}</p>
+			<p>Фамилия: {{ current_user.last_name }}</p>
+			<p>email: {{ current_user.email }}</p>
+		</div>
+		<div class="col-sm-6">
+			<h4 class="text-center"><strong>Избранные статьи</strong></h4>
+			<table class="table">
+			{% for article in current_user.favorite_articles.all %}
+				<tr>
+					<td class="delete_to_favorites-{{ article.slug }}" style="width: 80%;"><a href="{{ article.get_absolute_url }}" style="text-decoration: none;">{{ article.title }}</a></td>
+					<td class="delete_to_favorites-{{ article.slug }}"><button class="article btn btn-danger" title="{{ article.title }}" data-slug="{{ article.slug }}">Удалить из избранных</button></td>
+				</tr>
+			{% endfor %}
+			</table>
+		</div>				
+	</div>
+</div>
+
+{% block jquery %}
+
+<script>
+	$(document).ready(function(){
+		$('.article').on('click', function(){
+			var article_title=$(this).attr('title')
+			var confirmed=confirm('Удалить статью "'+article_title+'" из избранных ?')
+
+			if(confirmed){
+			var article_slug=$(this).attr('data-slug')
+
+			data={
+				article_slug: article_slug
+			}
+
+			$.ajax({
+				type: "GET",
+                url: '{% url "delete_to_favorites" %}',
+                data: data,
+                dataType: 'json',
+                success: function(data){
+            		$('.delete_to_favorites-'+article_slug).css('display', 'none')
+                }
+			})
+		}})
+	})
+</script>
+
+{% endblock jquery %}
+{% endblock content %}

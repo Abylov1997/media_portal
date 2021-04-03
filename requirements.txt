@@ -1,0 +1,4 @@
+Django==1.11.20
+django-crispy-forms==1.7.2
+Pillow==6.1.0
+pytz==2019.1
